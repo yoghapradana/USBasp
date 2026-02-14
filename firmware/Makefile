@@ -4,6 +4,15 @@
 #   20061120   Hanns-Konrad Unger   help: and TARGET=atmega48 added
 #
 
+# Helper for os specific commands:
+ifeq ($(OS),Windows_NT)
+    RM = del /Q
+    SLASH = \\
+else
+    RM = rm -f
+    SLASH = /
+endif
+
 # TARGET=atmega8    HFUSE=0xc9  LFUSE=0xef
 # TARGET=atmega48   HFUSE=0xdd  LFUSE=0xff
 # TARGET=at90s2313
@@ -56,14 +65,16 @@ OBJECTS = usbdrv/usbdrv.o usbdrv/usbdrvasm.o usbdrv/oddebug.o isp.o clock.o tpi.
 	$(COMPILE) -S $< -o $@
 
 clean:
-	rm -f main.hex main.lst main.obj main.cof main.list main.map main.eep.hex main.bin *.o main.s usbdrv/*.o
+	-$(RM) main.hex main.lst main.obj main.cof main.list main.map main.eep.hex main.bin main.s
+	-$(RM) *.o
+	-$(RM) usbdrv$(SLASH)*.o
 
 # file targets:
 main.bin:	$(OBJECTS)
 	$(COMPILE) -o main.bin $(OBJECTS) -Wl,-Map,main.map
 
 main.hex:	main.bin
-	rm -f main.hex main.eep.hex
+# -$(RM) main.hex main.eep.hex
 	avr-objcopy -j .text -j .data -O ihex main.bin main.hex
 #	./checksize main.bin
 # do the checksize script as our last action to allow successful compilation

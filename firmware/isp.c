@@ -14,6 +14,9 @@
 #include "clock.h"
 #include "usbasp.h"
 
+/* single definition of the transmit function pointer (extern in isp.h) */
+uchar (*ispTransmit)(uchar) = ispTransmit_sw;
+
 #define spiHWdisable() SPCR = 0
 
 uchar sck_sw_delay;
